@@ -227,4 +227,17 @@ html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui,
 }
 .btn-save-settings:hover { background: var(--accent2); }
 
+.update-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(59,158,255,.15); border: 1px solid var(--accent);
+  border-radius: var(--radius-sm); padding: 8px 12px; font-size: 12px;
+  color: var(--accent); gap: 10px;
+}
+.btn-update {
+  border: 1px solid var(--accent); background: var(--accent);
+  color: #fff; border-radius: var(--radius-sm); padding: 4px 12px;
+  font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.btn-update:hover { background: var(--accent2); }
+
 .hidden { display: none !important; }

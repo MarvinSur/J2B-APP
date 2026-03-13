@@ -6,17 +6,18 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build:win":   "electron-builder --win   --publish never",
-    "build:linux": "electron-builder --linux --publish never",
-    "build:mac":   "electron-builder --mac   --publish never"
+    "build:win":   "electron-builder --win   --publish onTagOrDraft",
+    "build:linux": "electron-builder --linux --publish onTagOrDraft",
+    "build:mac":   "electron-builder --mac   --publish onTagOrDraft"
   },
   "dependencies": {
-    "adm-zip":       "^0.5.10",
-    "node-fetch":    "^2.7.0",
-    "puppeteer-core":"^22.0.0",
-    "sharp":         "^0.33.3",
-    "three":         "^0.160.0",
-    "uuid":          "^9.0.0"
+    "adm-zip":         "^0.5.10",
+    "electron-updater":"^6.3.0",
+    "node-fetch":      "^2.7.0",
+    "puppeteer-core":  "^22.0.0",
+    "sharp":           "^0.33.3",
+    "three":           "^0.160.0",
+    "uuid":            "^9.0.0"
   },
   "devDependencies": {
     "electron":         "^30.0.0",
@@ -67,6 +68,11 @@
     "nsis": {
       "oneClick": true,
       "perMachine": false
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "MarvinSur",
+      "repo":  "J2B-APP"
     }
   }
 }
