@@ -7,6 +7,7 @@ const fs   = require('fs');
 const os   = require('os');
 const crypto = require('crypto');
 
+let win;
 let tempOutputDir = null;
 
 function createWindow() {

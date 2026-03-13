@@ -161,7 +161,8 @@
     "publish": {
       "provider": "github",
       "owner": "MarvinSur",
-      "repo": "J2B-APP"
+      "repo": "J2B-APP",
+      "releaseType": "release"
     }
   }
 }
