@@ -1,0 +1,73 @@
+{
+  "name": "j2b-converter",
+  "version": "1.0.0",
+  "description": "Java to Bedrock Resource Pack Converter",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win":   "electron-builder --win   --publish never",
+    "build:linux": "electron-builder --linux --publish never",
+    "build:mac":   "electron-builder --mac   --publish never"
+  },
+  "dependencies": {
+    "adm-zip":       "^0.5.10",
+    "node-fetch":    "^2.7.0",
+    "puppeteer-core":"^22.0.0",
+    "sharp":         "^0.33.3",
+    "three":         "^0.160.0",
+    "uuid":          "^9.0.0"
+  },
+  "devDependencies": {
+    "electron":         "^30.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.j2b.converter",
+    "productName": "J2B Converter",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "src/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      { "from": "../converter.sh",   "to": "converter.sh"   },
+      { "from": "../manager.py",     "to": "manager.py"     },
+      { "from": "../render_icon.js", "to": "render_icon.js" },
+      { "from": "../sound.py",       "to": "sound.py"       },
+      { "from": "../meg3.py",        "to": "meg3.py"        },
+      { "from": "../blocks.py",      "to": "blocks.py",       "filter": ["**"] },
+      { "from": "../blocks_util.py", "to": "blocks_util.py",  "filter": ["**"] },
+      { "from": "../bow.py",         "to": "bow.py",          "filter": ["**"] },
+      { "from": "../bow_util.py",    "to": "bow_util.py",     "filter": ["**"] },
+      { "from": "../shield.py",      "to": "shield.py",       "filter": ["**"] },
+      { "from": "../font.py",        "to": "font.py",         "filter": ["**"] },
+      { "from": "../font_sprite.py", "to": "font_sprite.py",  "filter": ["**"] },
+      { "from": "../blank256.png",   "to": "blank256.png",    "filter": ["**"] },
+      { "from": "../node_modules",   "to": "node_modules"   }
+    ],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "renderer/assets/icon.ico"
+    },
+    "linux": {
+      "target": [{ "target": "AppImage", "arch": ["x64"] }],
+      "icon": "renderer/assets/icon.png"
+    },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "icon": "renderer/assets/icon.icns",
+      "category": "public.app-category.utilities"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "installerIcon": "renderer/assets/icon.ico",
+      "uninstallerIcon": "renderer/assets/icon.ico"
+    }
+  }
+}

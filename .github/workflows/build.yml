@@ -1,0 +1,134 @@
+name: Build Electron App
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'all'
+        type: choice
+        options: [all, windows, linux, mac]
+
+jobs:
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    if: >
+      github.event_name == 'push' ||
+      inputs.platform == 'all' ||
+      inputs.platform == 'windows'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install root deps
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm install
+
+      - name: Install app deps
+        working-directory: app
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm install
+
+      - name: Build Windows installer
+        working-directory: app
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm run build:win
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: J2B-Converter-Windows
+          path: app/dist/*.exe
+          retention-days: 30
+
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'push' ||
+      inputs.platform == 'all' ||
+      inputs.platform == 'linux'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --fix-missing libvips-dev rpm fakeroot
+
+      - name: Install root deps
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm install
+
+      - name: Install app deps
+        working-directory: app
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm install
+
+      - name: Build Linux AppImage
+        working-directory: app
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm run build:linux
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: J2B-Converter-Linux
+          path: app/dist/*.AppImage
+          retention-days: 30
+
+  build-mac:
+    name: Build macOS
+    runs-on: macos-latest
+    if: >
+      github.event_name == 'push' ||
+      inputs.platform == 'all' ||
+      inputs.platform == 'mac'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install root deps
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm install
+
+      - name: Install app deps
+        working-directory: app
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: npm install
+
+      - name: Build macOS DMG
+        working-directory: app
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run build:mac
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: J2B-Converter-macOS
+          path: app/dist/*.dmg
+          retention-days: 30

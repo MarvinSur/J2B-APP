@@ -1,0 +1,46 @@
+name: Bug Report
+description: Report a problem with the converter output or script.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+        Please describe the issue clearly. Attach the action log or relevant output if possible.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: Describe what went wrong...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+      placeholder: Describe what you expected...
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or output
+      description: Paste the relevant portion of the action log here.
+      render: shell
+    validations:
+      required: false
+
+  - type: input
+    id: pack-url
+    attributes:
+      label: Resource pack URL (optional)
+      description: If you can share the pack, it will help reproduce the issue.
+      placeholder: https://example.com/mypack.zip
+    validations:
+      required: false

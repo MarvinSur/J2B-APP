@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J2B Converter</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="titlebar" id="titlebar">
+    <div class="titlebar-drag"></div>
+    <div class="titlebar-title">J2B Converter</div>
+    <div class="titlebar-controls">
+      <button id="btn-min"   class="tc">&#8722;</button>
+      <button id="btn-max"   class="tc">&#9633;</button>
+      <button id="btn-close" class="tc close">&#10005;</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <div class="preview-panel" id="preview-panel">
+      <div class="preview-inner">
+        <div class="preview-img-wrap" id="preview-wrap">
+          <img id="preview-img" src="assets/placeholder.png" alt="preview" draggable="false">
+          <div class="preview-label" id="preview-label">waiting for input…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <div class="brand">
+        <span class="brand-icon">⚡</span>
+        <div>
+          <div class="brand-title">J2B Converter</div>
+          <div class="brand-sub">Java → Bedrock Resource Pack</div>
+        </div>
+      </div>
+
+      <div class="section-label">Input Pack</div>
+      <button class="btn-primary" id="btn-pick">Choose ZIP…</button>
+      <div class="filepath-display" id="filepath-display">No file selected</div>
+
+      <div class="opts-row">
+        <label class="toggle-label">
+          <input type="checkbox" id="chk-transparent">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          Transparent BG
+        </label>
+      </div>
+
+      <button class="btn-convert" id="btn-convert" disabled>▶ Convert</button>
+      <button class="btn-cancel hidden" id="btn-cancel">■ Cancel</button>
+
+      <div class="progress-wrap hidden" id="progress-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">0 / 0</div>
+      </div>
+
+      <div class="current-item hidden" id="current-item">
+        <span class="ci-spinner">⏳</span>
+        <span id="ci-text">Preparing…</span>
+      </div>
+
+      <button class="btn-settings" id="btn-settings">⚙ Settings</button>
+
+      <div class="section-label">Log</div>
+      <div class="log-box" id="log-box"></div>
+
+      <div class="output-btns hidden" id="output-btns">
+        <button class="btn-open" id="btn-open-folder">📂 Open Output Folder</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="modal-backdrop">
+    <div class="modal" id="modal-settings">
+      <div class="modal-header">
+        <span>⚙ Settings</span>
+        <button class="modal-close" id="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-group-label">OUTPUT FORMAT</div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-title">Mapping Version</div>
+            <div class="setting-desc">Geyser mapping output format</div>
+          </div>
+          <select id="sel-mapping-version" class="setting-select">
+            <option value="1">V1</option>
+            <option value="2">V2</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-title">Output Resolution</div>
+            <div class="setting-desc">Size of the generated icon images</div>
+          </div>
+          <select id="sel-resolution" class="setting-select">
+            <option value="256">256×256</option>
+            <option value="128">128×128</option>
+            <option value="64" selected>64×64 (Default)</option>
+            <option value="32">32×32</option>
+          </select>
+        </div>
+
+        <div class="setting-group-label top-gap">CONVERSION OPTIONS</div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-title">Attachable Material</div>
+            <div class="setting-desc">Material used for held item models</div>
+          </div>
+          <select id="sel-attachable-mat" class="setting-select wide">
+            <option value="entity_alphatest_one_sided">entity_alphatest_one_sided</option>
+            <option value="entity_alphatest">entity_alphatest</option>
+            <option value="entity_emissive_alpha_one_sided">entity_emissive_alpha_one_sided</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-title">Block Material</div>
+            <div class="setting-desc">Material used for block models</div>
+          </div>
+          <select id="sel-block-mat" class="setting-select wide">
+            <option value="alpha_test">alpha_test</option>
+            <option value="blend">blend</option>
+            <option value="double_sided">double_sided</option>
+          </select>
+        </div>
+
+        <div class="setting-group-label top-gap">FUTURE FEATURES (COMING SOON)</div>
+        <div class="coming-soon-list">
+          <div class="cs-item">🔧 Merge with existing Bedrock pack</div>
+          <div class="cs-item">🔧 Custom fallback assets URL</div>
+          <div class="cs-item">🔧 Armor conversion toggle</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-save-settings" id="btn-save-settings">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

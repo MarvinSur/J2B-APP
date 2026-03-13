@@ -1,0 +1,85 @@
+name: MEG4 Conversion
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  convert:
+    if: github.event.label.name == 'meg-conversion'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pillow python-dotenv
+
+      - name: Parse issue body
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const match = body.match(/### Java Pack Direct Download URL\s*\n+([^\n]+)/);
+            const url = match ? match[1].trim() : '';
+            if (!url) core.setFailed('No download URL found in issue body');
+            core.setOutput('url', url);
+
+      - name: Download input zip
+        id: download
+        run: |
+          URL="${{ steps.parse.outputs.url }}"
+
+          # Normalize Dropbox
+          URL=$(echo "$URL" | sed 's|dropbox\.com/\(.*\)?dl=0|dropbox.com/\1?dl=1|g')
+          URL=$(echo "$URL" | sed 's|dropbox\.com/\(.*[^?]\)$|dropbox.com/\1?dl=1|g')
+
+          # Normalize Google Drive
+          if echo "$URL" | grep -q 'drive\.google\.com/file/d/'; then
+            FILE_ID=$(echo "$URL" | sed 's|.*drive\.google\.com/file/d/\([^/]*\).*|\1|')
+            URL="https://drive.google.com/uc?export=download&id=${FILE_ID}"
+          fi
+
+          curl -L \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+            -H "Accept: */*" \
+            --retry 3 --retry-delay 2 --max-time 120 \
+            -o input.zip "$URL"
+
+          ls -lah input.zip
+
+      - name: Convert to Bedrock Pack
+        id: convert
+        env:
+          file: input.zip
+          PACK_NAME: "Converted Meg4"
+          PACK_DESC: "Converted by J2B"
+        run: python meg4.py
+
+      - uses: actions/upload-artifact@v4
+        if: steps.convert.outcome == 'success'
+        with:
+          name: Converted_Pack
+          path: Converted_Pack.mcpack
+
+      - name: Post Result
+        if: always()
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ${{ steps.convert.outcome == 'success' && '## ✅ Conversion finished!\nDownload your pack from the [action run page][1]:\n- `Converted_Pack.mcpack` → import into Minecraft Bedrock\n\nIf anything looks wrong, check the action log and open a bug report.' || '## ❌ Conversion failed!\nCheck the [action run log][1] for details.' }}
+
+            [1]: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          reactions: ${{ steps.convert.outcome == 'success' && 'rocket' || 'confused' }}
+
+      - name: Close issue
+        if: always()
+        uses: peter-evans/close-issue@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}

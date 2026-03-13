@@ -1,0 +1,22 @@
+name: MEG4 Conversion Request
+description: Submit a ModelEngine v4 bbmodel zip for conversion to Bedrock format.
+title: "[MEG4] "
+labels:
+  - meg-conversion
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      placeholder: My ModelEngine Pack
+    validations:
+      required: true
+
+  - type: input
+    id: java-pack-direct-download-url
+    attributes:
+      label: Java Pack Direct Download URL
+      description: A **direct download link** to your `.zip` containing `.bbmodel` files.
+      placeholder: https://example.com/mymodels.zip
+    validations:
+      required: true

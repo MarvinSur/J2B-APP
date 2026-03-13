@@ -1,0 +1,9 @@
+{
+  "name": "j2b-converter",
+  "version": "2.0.0",
+  "description": "Java to Bedrock resource pack converter — render_icon.js (Puppeteer + Three.js)",
+  "dependencies": {
+    "puppeteer": "^22.0.0",
+    "three": "^0.160.0"
+  }
+}
