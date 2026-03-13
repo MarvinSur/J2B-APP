@@ -73,24 +73,21 @@ btnSaveSettings.addEventListener('click', async () => {
   log('Settings saved.', 'info');
 });
 
-// Convert — ask for save location first
+// Convert — convert first, then ask where to save
 btnConvert.addEventListener('click', async () => {
   if (!selectedZip) return;
 
-  // Ask user where to save
-  const saveDir = await window.api.pickSaveDir();
-  if (!saveDir) return; // user cancelled
-  outputDir = saveDir;
-
   setRunning(true);
   clearLog();
+  outputDir = null;
   progressFill.style.width = '0%';
   progressText.textContent = '0 / 0';
   outputBtns.classList.add('hidden');
 
+  // Use system temp as staging output — real save happens after done
   const res = await window.api.startConvert({
     zipPath:        selectedZip,
-    outputDir:      saveDir,
+    outputDir:      null,          // main.js will use app temp dir
     mappingVersion: settings.mappingVersion,
     resolution:     parseInt(settings.resolution),
     attachableMat:  settings.attachableMat,
@@ -142,12 +139,27 @@ function handleMsg(msg) {
   if (msg.type === 'output-dir') outputDir = msg.path;
 }
 
-function handleDone({ code }) {
+async function handleDone({ code }) {
   setRunning(false);
   if (code === 0) {
-    log('Conversion complete! ✅', 'ok');
-    outputBtns.classList.remove('hidden');
-    previewLabel.textContent = 'done!';
+    log('Conversion complete! Pilih tempat menyimpan hasil…', 'ok');
+
+    // Ask where to save AFTER conversion is done
+    const saveDir = await window.api.pickSaveDir();
+    if (!saveDir) {
+      log('Penyimpanan dibatalkan. File sementara akan dihapus.', 'err');
+      return;
+    }
+
+    const ok = await window.api.saveTempOutput(saveDir);
+    if (ok) {
+      outputDir = saveDir;
+      log('Tersimpan di: ' + saveDir, 'ok');
+      outputBtns.classList.remove('hidden');
+      previewLabel.textContent = 'done!';
+    } else {
+      log('Gagal menyimpan file output.', 'err');
+    }
   } else {
     log('Converter exited with code ' + code, 'err');
   }

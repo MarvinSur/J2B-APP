@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('api', {
   close:         ()   => ipcRenderer.send('win-close'),
   pickZip:       ()   => ipcRenderer.invoke('pick-zip'),
   pickSaveDir:   ()   => ipcRenderer.invoke('pick-save-dir'),
+  saveTempOutput:(d)  => ipcRenderer.invoke('save-temp-output', d),
   loadSettings:  ()   => ipcRenderer.invoke('load-settings'),
   saveSettings:  (d)  => ipcRenderer.invoke('save-settings', d),
   startConvert:  (o)  => ipcRenderer.invoke('start-convert', o),

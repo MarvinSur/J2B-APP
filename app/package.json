@@ -67,7 +67,8 @@
     },
     "nsis": {
       "oneClick": true,
-      "perMachine": false
+      "perMachine": false,
+      "include": "build/uninstaller.nsh"
     },
     "publish": {
       "provider": "github",

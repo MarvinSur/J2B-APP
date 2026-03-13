@@ -4,7 +4,10 @@ const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const fs   = require('fs');
 
-let win;
+const os   = require('os');
+const crypto = require('crypto');
+
+let tempOutputDir = null;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -82,8 +85,16 @@ let converterProc = null;
 
 ipcMain.handle('start-convert', async (_e, opts) => {
   if (converterProc) return { error: 'Already running' };
+
+  // Create a fresh temp output dir for this conversion
+  tempOutputDir = path.join(os.tmpdir(), `j2b_out_${crypto.randomBytes(4).toString('hex')}`);
+  fs.mkdirSync(tempOutputDir, { recursive: true });
+
   const workerPath = path.join(__dirname, 'src', 'converter-worker.js');
-  converterProc = fork(workerPath, [], { silent: true });
+  converterProc = fork(workerPath, [], {
+    silent: true,
+    env: { ...process.env, J2B_USER_DATA: app.getPath('userData') },
+  });
   converterProc.stdout.on('data', d => win.webContents.send('converter-log', d.toString()));
   converterProc.stderr.on('data', d => win.webContents.send('converter-log', d.toString()));
   converterProc.on('message', msg => win.webContents.send('converter-msg', msg));
@@ -91,8 +102,24 @@ ipcMain.handle('start-convert', async (_e, opts) => {
     win.webContents.send('converter-done', { code });
     converterProc = null;
   });
-  converterProc.send({ type: 'start', opts });
+  converterProc.send({ type: 'start', opts: { ...opts, outputDir: tempOutputDir } });
   return { started: true };
+});
+
+// Copy temp output to user-chosen save dir
+ipcMain.handle('save-temp-output', async (_e, saveDir) => {
+  if (!tempOutputDir) return false;
+  try {
+    fs.mkdirSync(saveDir, { recursive: true });
+    for (const file of ['geyser_resources.mcpack', 'geyser_mappings.json']) {
+      const src = path.join(tempOutputDir, file);
+      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(saveDir, file));
+    }
+    // Cleanup temp output
+    try { fs.rmSync(tempOutputDir, { recursive: true, force: true }); } catch {}
+    tempOutputDir = null;
+    return true;
+  } catch { return false; }
 });
 
 ipcMain.on('cancel-convert', () => {
