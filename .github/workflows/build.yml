@@ -38,6 +38,9 @@ jobs:
           PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm install
 
+      - name: Check icon exists
+        run: ls app/renderer/assets/
+
       - name: Build Windows installer
         working-directory: app
         env:

@@ -2,6 +2,7 @@
   "name": "j2b-converter",
   "version": "1.0.0",
   "description": "Java to Bedrock Resource Pack Converter",
+  "author": "J2B Converter",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -60,14 +61,12 @@
     },
     "mac": {
       "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
-      "icon": "renderer/assets/icon.icns",
+      "icon": "renderer/assets/icon_mac.png",
       "category": "public.app-category.utilities"
     },
     "nsis": {
       "oneClick": true,
-      "perMachine": false,
-      "installerIcon": "renderer/assets/icon.ico",
-      "uninstallerIcon": "renderer/assets/icon.ico"
+      "perMachine": false
     }
   }
 }
