@@ -75,21 +75,16 @@ jobs:
           node-version: 20
 
       - name: Install root deps
-        env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm install
 
       - name: Install app deps
         working-directory: app
-        env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm install
 
-      # electron-builder publishes to GitHub Release AND uploads latest.yml automatically
+      # --publish always → electron-builder creates GitHub Release + uploads .exe + latest.yml
       - name: Build & Publish Windows
         working-directory: app
         env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:win
 
@@ -127,20 +122,15 @@ jobs:
           sudo apt-get install -y --fix-missing libvips-dev rpm fakeroot
 
       - name: Install root deps
-        env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm install
 
       - name: Install app deps
         working-directory: app
-        env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm install
 
       - name: Build & Publish Linux
         working-directory: app
         env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:linux
 
@@ -173,20 +163,15 @@ jobs:
           node-version: 20
 
       - name: Install root deps
-        env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm install
 
       - name: Install app deps
         working-directory: app
-        env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
         run: npm install
 
       - name: Build & Publish macOS
         working-directory: app
         env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:mac

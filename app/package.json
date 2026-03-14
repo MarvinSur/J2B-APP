@@ -6,15 +6,15 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build:win": "electron-builder --win   --publish onTagOrDraft",
-    "build:linux": "electron-builder --linux --publish onTagOrDraft",
-    "build:mac": "electron-builder --mac   --publish onTagOrDraft"
+    "build:win": "electron-builder --win   --publish always",
+    "build:linux": "electron-builder --linux --publish always",
+    "build:mac": "electron-builder --mac   --publish always"
   },
   "dependencies": {
     "adm-zip": "^0.5.10",
     "electron-updater": "^6.3.0",
     "node-fetch": "^2.7.0",
-    "puppeteer-core": "^22.0.0",
+    "puppeteer": "^22.0.0",
     "sharp": "^0.33.3",
     "three": "^0.160.0",
     "uuid": "^9.0.0"
@@ -25,7 +25,7 @@
   },
   "build": {
     "appId": "com.j2b.converter",
-    "productName": "J2B Converter",
+    "productName": "J2B_Converter",
     "directories": {
       "output": "dist"
     },
@@ -116,6 +116,11 @@
       {
         "from": "../node_modules",
         "to": "node_modules"
+      },
+      {
+        "from": "../node_modules/puppeteer/.local-chromium",
+        "to": "node_modules/puppeteer/.local-chromium",
+        "filter": ["**"]
       }
     ],
     "win": {
@@ -153,6 +158,7 @@
       "icon": "renderer/assets/icon_mac.png",
       "category": "public.app-category.utilities"
     },
+    "artifactName": "${productName}_${version}.${ext}",
     "nsis": {
       "oneClick": true,
       "perMachine": false,

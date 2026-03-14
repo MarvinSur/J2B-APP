@@ -91,10 +91,26 @@ ipcMain.handle('start-convert', async (_e, opts) => {
   tempOutputDir = path.join(os.tmpdir(), `j2b_out_${crypto.randomBytes(4).toString('hex')}`);
   fs.mkdirSync(tempOutputDir, { recursive: true });
 
+  // Resolve chromium executable path — works in packaged app and dev
+  const chromiumBasePath = app.isPackaged
+    ? path.join(process.resourcesPath, 'node_modules', 'puppeteer')
+    : path.join(__dirname, '..', 'node_modules', 'puppeteer');
+  let chromiumExe = null;
+  try {
+    const { executablePath } = require(path.join(chromiumBasePath, 'lib', 'cjs', 'puppeteer', 'node.js'));
+    chromiumExe = executablePath();
+  } catch {
+    // fallback: let puppeteer find it itself
+  }
+
   const workerPath = path.join(__dirname, 'src', 'converter-worker.js');
   converterProc = fork(workerPath, [], {
     silent: true,
-    env: { ...process.env, J2B_USER_DATA: app.getPath('userData') },
+    env: {
+      ...process.env,
+      J2B_USER_DATA: app.getPath('userData'),
+      ...(chromiumExe ? { PUPPETEER_EXECUTABLE_PATH: chromiumExe } : {}),
+    },
   });
   converterProc.stdout.on('data', d => win.webContents.send('converter-log', d.toString()));
   converterProc.stderr.on('data', d => win.webContents.send('converter-log', d.toString()));

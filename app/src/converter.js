@@ -63,6 +63,11 @@ function resolveParent(modelJson, assetsDir, maxDepth = 30) {
   return { elements, textures, display, isGenerated };
 }
 
+// Namespaces to skip — ModelEngine internals, sound-only packs, etc.
+const SKIP_NAMESPACES = new Set([
+  'modelengine', '_iainternal',
+]);
+
 function buildConfigOld(itemDir, itemTexture) {
   const config = {};
   let idx = 0;
@@ -78,6 +83,7 @@ function buildConfigOld(itemDir, itemTexture) {
       if (cmd == null && dmg == null && !unb) continue;
       if (!ov.model) continue;
       const ns = nsOf(ov.model), mp = pathOf(ov.model);
+      if (SKIP_NAMESPACES.has(ns)) continue;  // skip ModelEngine etc.
       const gid = `gmdl_${++idx}`;
       config[gid] = {
         geyserID: gid, item: itemName,

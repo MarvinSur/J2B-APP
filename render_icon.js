@@ -239,8 +239,11 @@ async function main() {
   const lines = fs.readFileSync(jobsCsv, 'utf8').split('\n').map(l => l.trim()).filter(Boolean);
   if (!lines.length) process.exit(0);
 
+  // In packaged Electron app, chromium lives in resources/node_modules/puppeteer/.local-chromium
+  const chromiumOverride = process.env.PUPPETEER_EXECUTABLE_PATH || null;
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath: chromiumOverride || undefined,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
 
