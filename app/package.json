@@ -120,13 +120,7 @@
       {
         "from": "../node_modules/puppeteer/.cache",
         "to": "node_modules/puppeteer/.cache",
-<<<<<<< HEAD
         "filter": ["**"]
-=======
-        "filter": [
-          "**"
-        ]
->>>>>>> da1e6b9ae0137489d6535e83ee2afc3b47c821b9
       }
     ],
     "win": {
