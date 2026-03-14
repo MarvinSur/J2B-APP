@@ -1,6 +1,6 @@
 {
   "name": "j2b-converter",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Java to Bedrock Resource Pack Converter",
   "author": "J2B Converter",
   "main": "main.js",
@@ -120,7 +120,9 @@
       {
         "from": "../node_modules/puppeteer/.local-chromium",
         "to": "node_modules/puppeteer/.local-chromium",
-        "filter": ["**"]
+        "filter": [
+          "**"
+        ]
       }
     ],
     "win": {
