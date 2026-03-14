@@ -536,7 +536,9 @@ async function convert(opts, emitFn) {
   // ── Fallback vanilla assets (cached)
   log('process', 'Loading fallback vanilla assets…');
   try {
-    const userDataDir = process.env.J2B_USER_DATA || scratch;
+    // J2B_USER_DATA set by main.js; fallback to platform appdata
+    const appData = process.env.APPDATA || process.env.HOME || os.homedir();
+    const userDataDir = process.env.J2B_USER_DATA || path.join(appData, 'j2b-converter');
     const cacheDir = path.join(userDataDir, 'cache'); mkdirp(cacheDir);
     const cachedZip = path.join(cacheDir, 'fallback_1.20.4.zip');
     if (!fs.existsSync(cachedZip)) {
@@ -680,19 +682,22 @@ async function convert(opts, emitFn) {
 
     // Geometry
     const geoJson = genGeometry(e, atlasInfo.frames, atlasInfo.size);
-    const geoDir  = path.join(rpDir,'models','blocks',e.namespace,e.model_path);
+    const geoParts = [rpDir,'models','blocks',e.namespace,e.model_path].filter(Boolean);
+    const geoDir   = path.join(...geoParts);
     mkdirp(geoDir);
     fs.writeFileSync(path.join(geoDir, e.model_name+'.json'), JSON.stringify(geoJson,null,2));
 
     // Animation
     const animJson = genAnimations(e);
-    const animDir  = path.join(rpDir,'animations',e.namespace,e.model_path);
+    const animParts = [rpDir,'animations',e.namespace,e.model_path].filter(Boolean);
+    const animDir   = path.join(...animParts);
     mkdirp(animDir);
     fs.writeFileSync(path.join(animDir, `animation.${e.model_name}.json`), JSON.stringify(animJson,null,2));
 
     // Attachable
     const attJson = genAttachable(e, atlasInfo.index, attachableMat);
-    const attDir  = path.join(rpDir,'attachables',e.namespace,e.model_path);
+    const attParts = [rpDir,'attachables',e.namespace,e.model_path].filter(Boolean);
+    const attDir   = path.join(...attParts);
     mkdirp(attDir);
     fs.writeFileSync(path.join(attDir, `${e.model_name}.${e.path_hash}.attachable.json`), JSON.stringify(attJson,null,2));
   }
@@ -705,24 +710,28 @@ async function convert(opts, emitFn) {
     if (!firstRef) continue;
     const texFile = resolveTexPath(firstRef, e.resolved.textures, assetsDir);
     if (!texFile) continue;
-    const destDir  = path.join(rpDir,'textures',e.namespace,e.model_path);
-    mkdirp(destDir);
-    fs.copyFileSync(texFile, path.join(destDir, e.model_name+'.png'));
-    itemTextureOut.texture_data[e.path_hash] = { textures:`textures/${e.namespace}/${e.model_path}/${e.model_name}` };
+    const destParts2d = [rpDir,'textures',e.namespace,e.model_path].filter(Boolean);
+    const destDir2d   = path.join(...destParts2d);
+    mkdirp(destDir2d);
+    fs.copyFileSync(texFile, path.join(destDir2d, e.model_name+'.png'));
+    const texRef2d = e.model_path
+      ? `textures/${e.namespace}/${e.model_path}/${e.model_name}`
+      : `textures/${e.namespace}/${e.model_name}`;
+    itemTextureOut.texture_data[e.path_hash] = { textures: texRef2d };
 
-    // Also generate geometry + animation + attachable for 2D items (texture_mesh based)
-    const geoJson  = genGeometry(e, {}, { w:16,h:16 });
-    const geoDir   = path.join(rpDir,'models','blocks',e.namespace,e.model_path);
-    mkdirp(geoDir);
-    fs.writeFileSync(path.join(geoDir, e.model_name+'.json'), JSON.stringify(geoJson,null,2));
-    const animJson = genAnimations(e);
-    const animDir  = path.join(rpDir,'animations',e.namespace,e.model_path);
-    mkdirp(animDir);
-    fs.writeFileSync(path.join(animDir, `animation.${e.model_name}.json`), JSON.stringify(animJson,null,2));
-    const attJson  = genAttachable(e, null, attachableMat);
-    const attDir   = path.join(rpDir,'attachables',e.namespace,e.model_path);
-    mkdirp(attDir);
-    fs.writeFileSync(path.join(attDir, `${e.model_name}.${e.path_hash}.attachable.json`), JSON.stringify(attJson,null,2));
+    // Geometry + animation + attachable for 2D items
+    const geoJson2d  = genGeometry(e, {}, { w:16,h:16 });
+    const geoParts2d = [rpDir,'models','blocks',e.namespace,e.model_path].filter(Boolean);
+    mkdirp(path.join(...geoParts2d));
+    fs.writeFileSync(path.join(...geoParts2d, e.model_name+'.json'), JSON.stringify(geoJson2d,null,2));
+    const animJson2d = genAnimations(e);
+    const animParts2d = [rpDir,'animations',e.namespace,e.model_path].filter(Boolean);
+    mkdirp(path.join(...animParts2d));
+    fs.writeFileSync(path.join(...animParts2d, `animation.${e.model_name}.json`), JSON.stringify(animJson2d,null,2));
+    const attJson2d  = genAttachable(e, null, attachableMat);
+    const attParts2d = [rpDir,'attachables',e.namespace,e.model_path].filter(Boolean);
+    mkdirp(path.join(...attParts2d));
+    fs.writeFileSync(path.join(...attParts2d, `${e.model_name}.${e.path_hash}.attachable.json`), JSON.stringify(attJson2d,null,2));
   }
 
   // ── Zicons (render_icon.js for 3D, texture copy for 2D)
@@ -730,10 +739,13 @@ async function convert(opts, emitFn) {
   const zIconJobs=[], seenModel=new Map();
 
   for (const e of [...entries3d, ...entries2d]) {
-    const iconDir = path.join(rpDir,'textures','zicon',e.namespace,e.model_path||'');
+    const iconParts = [rpDir,'textures','zicon',e.namespace,e.model_path].filter(Boolean);
+    const iconDir   = path.join(...iconParts);
     mkdirp(iconDir);
     const outIcon = path.join(iconDir, e.path_hash+'.png');
-    const iconRef = `textures/zicon/${e.namespace}/${e.model_path?e.model_path+'/':''}${e.path_hash}`;
+    const iconRef = e.model_path
+      ? `textures/zicon/${e.namespace}/${e.model_path}/${e.path_hash}`
+      : `textures/zicon/${e.namespace}/${e.path_hash}`;
 
     if (e.generated) {
       // 2D: copy texture
