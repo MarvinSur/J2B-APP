@@ -91,16 +91,18 @@ ipcMain.handle('start-convert', async (_e, opts) => {
   tempOutputDir = path.join(os.tmpdir(), `j2b_out_${crypto.randomBytes(4).toString('hex')}`);
   fs.mkdirSync(tempOutputDir, { recursive: true });
 
-  // Resolve chromium executable path — works in packaged app and dev
-  const chromiumBasePath = app.isPackaged
+  // Resolve chromium path — puppeteer v22+ uses .cache/puppeteer
+  const puppeteerRoot = app.isPackaged
     ? path.join(process.resourcesPath, 'node_modules', 'puppeteer')
     : path.join(__dirname, '..', 'node_modules', 'puppeteer');
   let chromiumExe = null;
   try {
-    const { executablePath } = require(path.join(chromiumBasePath, 'lib', 'cjs', 'puppeteer', 'node.js'));
-    chromiumExe = executablePath();
+    // Override PUPPETEER_CACHE_DIR so puppeteer looks in the right place
+    process.env.PUPPETEER_CACHE_DIR = path.join(puppeteerRoot, '.cache');
+    const pup = require(path.join(puppeteerRoot, 'lib', 'cjs', 'puppeteer', 'puppeteer-core.js'));
+    chromiumExe = pup.executablePath?.() || null;
   } catch {
-    // fallback: let puppeteer find it itself
+    // fallback: puppeteer finds chromium via its own logic
   }
 
   const workerPath = path.join(__dirname, 'src', 'converter-worker.js');
@@ -109,6 +111,7 @@ ipcMain.handle('start-convert', async (_e, opts) => {
     env: {
       ...process.env,
       J2B_USER_DATA: app.getPath('userData'),
+      PUPPETEER_CACHE_DIR: path.join(puppeteerRoot, '.cache'),
       ...(chromiumExe ? { PUPPETEER_EXECUTABLE_PATH: chromiumExe } : {}),
     },
   });

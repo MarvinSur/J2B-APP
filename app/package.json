@@ -118,8 +118,8 @@
         "to": "node_modules"
       },
       {
-        "from": "../node_modules/puppeteer/.local-chromium",
-        "to": "node_modules/puppeteer/.local-chromium",
+        "from": "../node_modules/puppeteer/.cache",
+        "to": "node_modules/puppeteer/.cache",
         "filter": ["**"]
       }
     ],
@@ -149,10 +149,11 @@
       "target": [
         {
           "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64"]
         }
       ],
       "icon": "renderer/assets/icon_mac.png",
