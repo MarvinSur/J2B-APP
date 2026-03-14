@@ -1,6 +1,6 @@
 {
   "name": "j2b-converter",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Java to Bedrock Resource Pack Converter",
   "author": "J2B Converter",
   "main": "main.js",
@@ -120,7 +120,9 @@
       {
         "from": "../node_modules/puppeteer/.cache",
         "to": "node_modules/puppeteer/.cache",
-        "filter": ["**"]
+        "filter": [
+          "**"
+        ]
       }
     ],
     "win": {
@@ -149,11 +151,15 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["arm64"]
+          "arch": [
+            "arm64"
+          ]
         }
       ],
       "icon": "renderer/assets/icon_mac.png",
