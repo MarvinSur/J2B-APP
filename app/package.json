@@ -1,6 +1,6 @@
 {
   "name": "j2b-converter",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Java to Bedrock Resource Pack Converter",
   "author": "J2B Converter",
   "main": "main.js",
