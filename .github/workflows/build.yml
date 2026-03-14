@@ -3,14 +3,6 @@ name: Build Electron App
 on:
   push:
     branches: [main]
-  workflow_dispatch:
-    inputs:
-      platform:
-        description: 'Platform to build'
-        required: true
-        default: 'all'
-        type: choice
-        options: [all, windows, linux, mac]
 
 jobs:
   # ── 1. Bump version & create tag ────────────────────────────────────────────
@@ -70,7 +62,7 @@ jobs:
         with:
           script: |
             const tag = '${{ needs.version.outputs.new_tag }}';
-            const release = await github.rest.releases.createRelease({
+            const release = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: tag,
@@ -86,11 +78,7 @@ jobs:
     name: Build Windows
     runs-on: windows-latest
     needs: [version, create-release]
-    if: |
-      always() && (
-        (needs.version.result == 'success' && needs.create-release.result == 'success') ||
-        (github.event_name == 'workflow_dispatch' && (inputs.platform == 'all' || inputs.platform == 'windows'))
-      )
+    if: needs.version.result == 'success' && needs.create-release.result == 'success'
     permissions:
       contents: write
     steps:
@@ -127,11 +115,7 @@ jobs:
     name: Build Linux
     runs-on: ubuntu-latest
     needs: [version, create-release]
-    if: |
-      always() && (
-        (needs.version.result == 'success' && needs.create-release.result == 'success') ||
-        (github.event_name == 'workflow_dispatch' && (inputs.platform == 'all' || inputs.platform == 'linux'))
-      )
+    if: needs.version.result == 'success' && needs.create-release.result == 'success'
     permissions:
       contents: write
     steps:
@@ -173,11 +157,7 @@ jobs:
     name: Build macOS
     runs-on: macos-latest
     needs: [version, create-release]
-    if: |
-      always() && (
-        (needs.version.result == 'success' && needs.create-release.result == 'success') ||
-        (github.event_name == 'workflow_dispatch' && (inputs.platform == 'all' || inputs.platform == 'mac'))
-      )
+    if: needs.version.result == 'success' && needs.create-release.result == 'success'
     permissions:
       contents: write
     steps:
